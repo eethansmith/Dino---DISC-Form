@@ -47,7 +47,7 @@ if 'disc_scores_most' not in st.session_state:
 if 'disc_scores_least' not in st.session_state:
     st.session_state.disc_scores_least = {"D": 0, "I": 0, "S": 0, "C": 0, "*": 0}
 
-# Create the table layout with checkbox columns
+# Create the table layout with radio buttons
 st.write("### DISC Personality Assessment")
 st.write("""Choose the option which best reflects your personality. Select one option as the most likely and one option as the least likely.""")
 st.write("""This form should be completed within **7 minutes**, or as close to that as possible.""")
@@ -56,31 +56,24 @@ for idx, (most_mapping, least_mapping) in enumerate(zip(all_most_mappings, all_l
     col1, col2, col3 = st.columns([1, 1, 4])
 
     with col1:
-        st.write(f"Most Likely")
+        st.session_state.most_likely[idx] = st.radio(
+            f"Most Likely {idx+1}",
+            list(most_mapping.keys()),
+            index=list(most_mapping.keys()).index(st.session_state.most_likely[idx]) if st.session_state.most_likely[idx] else 0,
+            key=f"most_{idx}"
+        )
 
     with col2:
-        st.write(f"Least Likely")
+        st.session_state.least_likely[idx] = st.radio(
+            f"Least Likely {idx+1}",
+            list(least_mapping.keys()),
+            index=list(least_mapping.keys()).index(st.session_state.least_likely[idx]) if st.session_state.least_likely[idx] else 0,
+            key=f"least_{idx}"
+        )
 
     with col3:
-        st.write("Options")
-
-    options = most_mapping.keys()
-    for option in options:
-        with col1:
-            # Handle Most Likely selection
-            if st.checkbox("", key=f"most_{option}_{idx}", value=(st.session_state.most_likely[idx] == option), label_visibility="collapsed"):
-                st.session_state.most_likely[idx] = option
-            elif st.session_state.most_likely[idx] == option:
-                st.session_state.most_likely[idx] = None
-
-        with col2:
-            # Handle Least Likely selection
-            if st.checkbox("", key=f"least_{option}_{idx}", value=(st.session_state.least_likely[idx] == option), label_visibility="collapsed"):
-                st.session_state.least_likely[idx] = option
-            elif st.session_state.least_likely[idx] == option:
-                st.session_state.least_likely[idx] = None
-        
-        with col3:
+        st.write("Options:")
+        for option in most_mapping.keys():
             st.write(option)
 
 # Validation and Submission
