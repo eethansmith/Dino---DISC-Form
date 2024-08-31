@@ -1,7 +1,7 @@
 import streamlit as st
 
 # Define the options for the table rows
-options = ["Option 1", "Option 2", "Option 3", "Option 4"]
+options = ["Easy-going, Agreeable", "Trusting, Believing in others", "Adventurous, Risk taker", "Tolerant, Respectful"]
 
 # Initialize session state to store selections
 if 'most_likely' not in st.session_state:
@@ -11,7 +11,9 @@ if 'least_likely' not in st.session_state:
     st.session_state.least_likely = None
 
 # Create the table layout with checkbox columns
-st.write("### Choose the most likely and least likely options:")
+st.write("### DISC Personality Assessment")
+st.write("""Choose the option which best reflects your personality. Select one option as the most likely and one option as the least likely.""")
+st.write("""This form should be completed within **7 minutes**, or as close to that as possible.""")
 
 col1, col2, col3 = st.columns([1, 1, 4])
 
