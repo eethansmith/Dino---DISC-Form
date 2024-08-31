@@ -41,8 +41,11 @@ if 'most_likely' not in st.session_state:
 if 'least_likely' not in st.session_state:
     st.session_state.least_likely = [None, None]
 
-if 'disc_scores' not in st.session_state:
-    st.session_state.disc_scores = {"D": 0, "I": 0, "S": 0, "C": 0, "*": 0}
+if 'disc_scores_most' not in st.session_state:
+    st.session_state.disc_scores_most = {"D": 0, "I": 0, "S": 0, "C": 0, "*": 0}
+
+if 'disc_scores_least' not in st.session_state:
+    st.session_state.disc_scores_least = {"D": 0, "I": 0, "S": 0, "C": 0, "*": 0}
 
 # Create the table layout with checkbox columns
 st.write("### DISC Personality Assessment")
@@ -53,10 +56,10 @@ for idx, (most_mapping, least_mapping) in enumerate(zip(all_most_mappings, all_l
     col1, col2, col3 = st.columns([1, 1, 4])
 
     with col1:
-        st.write(f"Most Likely (Set {idx + 1})")
+        st.write(f"Most Likely")
 
     with col2:
-        st.write(f"Least Likely (Set {idx + 1})")
+        st.write(f"Least Likely")
 
     with col3:
         st.write("Options")
@@ -87,24 +90,25 @@ if all(st.session_state.most_likely) and all(st.session_state.least_likely):
     else:
         if st.button("Submit"):
             # Reset DISC scores before calculation
-            st.session_state.disc_scores = {"D": 0, "I": 0, "S": 0, "C": 0, "*": 0}
+            st.session_state.disc_scores_most = {"D": 0, "I": 0, "S": 0, "C": 0, "*": 0}
+            st.session_state.disc_scores_least = {"D": 0, "I": 0, "S": 0, "C": 0, "*": 0}
 
             # Calculate DISC scores based on the mappings
             for idx, (most_option, least_option) in enumerate(zip(st.session_state.most_likely, st.session_state.least_likely)):
                 most_disc_type = all_most_mappings[idx][most_option]
                 least_disc_type = all_least_mappings[idx][least_option]
 
-                st.session_state.disc_scores[most_disc_type] += 1  # Increment for Most Likely
-                st.session_state.disc_scores[least_disc_type] += 1  # Increment for Least Likely
+                st.session_state.disc_scores_most[most_disc_type] += 1  # Increment for Most Likely
+                st.session_state.disc_scores_least[least_disc_type] += 1  # Increment for Least Likely
 
             # Prepare data for the table
             data = {
                 "Category": ["Most Likely", "Least Likely"],
-                "D": [st.session_state.disc_scores["D"], st.session_state.disc_scores["D"]],
-                "I": [st.session_state.disc_scores["I"], st.session_state.disc_scores["I"]],
-                "S": [st.session_state.disc_scores["S"], st.session_state.disc_scores["S"]],
-                "C": [st.session_state.disc_scores["C"], st.session_state.disc_scores["C"]],
-                "*": [st.session_state.disc_scores["*"], st.session_state.disc_scores["*"]]
+                "D": [st.session_state.disc_scores_most["D"], st.session_state.disc_scores_least["D"]],
+                "I": [st.session_state.disc_scores_most["I"], st.session_state.disc_scores_least["I"]],
+                "S": [st.session_state.disc_scores_most["S"], st.session_state.disc_scores_least["S"]],
+                "C": [st.session_state.disc_scores_most["C"], st.session_state.disc_scores_least["C"]],
+                "*": [st.session_state.disc_scores_most["*"], st.session_state.disc_scores_least["*"]]
             }
 
             # Convert to DataFrame and display as a table
