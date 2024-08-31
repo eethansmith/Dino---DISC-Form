@@ -1,0 +1,38 @@
+{
+    "mapping1": {
+        "Easy-going, Agreeable": {
+            "most": "S",
+            "least": "S"
+        },
+        "Trusting, Believing in others": {
+            "most": "I",
+            "least": "I"
+        },
+        "Adventurous, Risk taker": {
+            "most": "*",
+            "least": "D"
+        },
+        "Tolerant, Respectful": {
+            "most": "C",
+            "least": "C"
+        }
+    },
+    "mapping2": {
+        "Soft spoken, Reserved": {
+            "most": "C",
+            "least": "*"
+        },
+        "Optimistic, Visionary": {
+            "most": "D",
+            "least": "D"
+        },
+        "Center of attention, Sociable": {
+            "most": "*",
+            "least": "I"
+        },
+        "Peacemaker, Bring harmony": {
+            "most": "S",
+            "least": "S"
+        }
+    }
+}
