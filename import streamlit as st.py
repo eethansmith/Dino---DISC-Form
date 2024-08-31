@@ -96,9 +96,11 @@ if len(most_likely_selections) == len(all_mappings) and len(least_likely_selecti
                 "*": [st.session_state.disc_scores_most["*"], st.session_state.disc_scores_least["*"]]
             }
 
-            # Convert to DataFrame and display as a table
             df = pd.DataFrame(data)
+
+            # Use the 'columns' argument to exclude the index explicitly
             st.write("### DISC Scores Table")
-            st.table(df)
+            st.write(df.to_html(index=False), unsafe_allow_html=True)
+
 else:
     st.error("Please make a selection for both most likely and least likely options in each set.")
