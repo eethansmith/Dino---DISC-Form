@@ -1,7 +1,33 @@
 import streamlit as st
 
-# Define the options for the table rows
-options = ["Easy-going, Agreeable", "Trusting, Believing in others", "Adventurous, Risk taker", "Tolerant, Respectful"]
+# Define the options for the table rows and their corresponding DISC types
+most_mapping1 = {
+    "Easy-going, Agreeable": "S",
+    "Trusting, Believing in others": "I",
+    "Adventurous, Risk taker": "*",
+    "Tolerant, Respectful": "C"
+}
+
+least_mapping1 = {
+    "Easy-going, Agreeable": "S",
+    "Trusting, Believing in others": "I",
+    "Adventurous, Risk taker": "D",
+    "Tolerant, Respectful": "C"
+}
+
+most_mapping2 = {
+    "Soft spoken, Reserved": "C",
+    "Optimistic, Visionary": "D",
+    "Center of attention, Sociable": "*",
+    "Peacemaker, Bring harmony": "S"
+}
+
+least_mapping2 = {
+    "Soft spoken, Reserved": "*",
+    "Optimistic, Visionary": "D",
+    "Center of attention, Sociable": "I",
+    "Peacemaker, Bring harmony": "S"
+}
 
 # Initialize session state to store selections
 if 'most_likely' not in st.session_state:
@@ -9,6 +35,9 @@ if 'most_likely' not in st.session_state:
 
 if 'least_likely' not in st.session_state:
     st.session_state.least_likely = None
+
+if 'disc_scores' not in st.session_state:
+    st.session_state.disc_scores = {"D": 0, "I": 0, "S": 0, "C": 0, "*": 0}
 
 # Create the table layout with checkbox columns
 st.write("### DISC Personality Assessment")
