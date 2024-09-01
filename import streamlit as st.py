@@ -6,18 +6,15 @@ import json
 with open('disc_mappings.json', 'r') as f:
     mappings = json.load(f)
 
-# Extract mappings
-mapping1 = mappings["mapping1"]
-mapping2 = mappings["mapping2"]
-
-all_mappings = [mapping1, mapping2]
+# Extract all mappings dynamically
+all_mappings = [mappings[f"mapping{i}"] for i in range(1, 25)]  # Adjust range based on the number of mappings in your JSON
 
 # Initialize session state to store selections
 if 'most_likely' not in st.session_state:
-    st.session_state.most_likely = [None, None]
+    st.session_state.most_likely = [None] * len(all_mappings)
 
 if 'least_likely' not in st.session_state:
-    st.session_state.least_likely = [None, None]
+    st.session_state.least_likely = [None] * len(all_mappings)
 
 if 'disc_scores_most' not in st.session_state:
     st.session_state.disc_scores_most = {"D": 0, "I": 0, "S": 0, "C": 0, "*": 0}
@@ -32,7 +29,7 @@ def on_change_checkbox(current_key, idx, column):
             st.session_state[key] = False
 
 # Initialize the keys for checkboxes
-st.session_state.checkbox_keys = [[[], []], [[], []]]  # Separate lists for each table's most and least likely
+st.session_state.checkbox_keys = [[[], []] for _ in all_mappings]  # Adjust lists based on the number of mappings
 
 # Create the table layout with checkboxes
 st.write("### DISC Personality Assessment")
