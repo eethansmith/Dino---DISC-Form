@@ -22,11 +22,28 @@ if 'disc_scores_most' not in st.session_state:
 if 'disc_scores_least' not in st.session_state:
     st.session_state.disc_scores_least = {"D": 0, "I": 0, "S": 0, "C": 0, "*": 0}
 
+if 'current_section' not in st.session_state:
+    st.session_state.current_section = 0  # Start at the first section
+
+
 # Define a function to ensure only one checkbox is selected at a time in a column
 def on_change_checkbox(current_key, idx, column):
+    # Ensure only one checkbox is selected in the current column
     for key in st.session_state.checkbox_keys[idx][column]:
         if key != current_key:
             st.session_state[key] = False
+
+    # Check if the same option is selected for both most and least likely
+    other_column = 1 - column
+    current_option = current_key.split("_")[2]
+    conflicting_key = f"{'most' if other_column == 0 else 'least'}_{idx}_{current_option}"
+    
+    if st.session_state.get(current_key) and st.session_state.get(conflicting_key):
+        st.session_state[current_key] = False  # Reset the current selection
+        st.session_state.same_option_error = True  # Set error flag
+    else:
+        st.session_state.same_option_error = False  # Reset error flag if no conflict
+
 
 # Initialize the keys for checkboxes
 st.session_state.checkbox_keys = [[[], []] for _ in all_mappings]  # Adjust lists based on the number of mappings
@@ -36,35 +53,44 @@ st.write("### DISC Personality Assessment")
 st.write("""Choose the option which best reflects your personality. Select one option as the **most likely** and one option as the **least likely**.""")
 st.write("""This form should be completed within **7 minutes**, or as close to that as possible.""")
 
-for idx, mapping in enumerate(all_mappings):
-    col1, col2, col3 = st.columns([1, 1, 5])
+idx = st.session_state.current_section
+mapping = all_mappings[idx]
 
-    with col1:
-        st.write("**Most Likely**")
-        for option in mapping.keys():
-            key = f"most_{idx}_{option}"
-            st.checkbox("", key=key, on_change=on_change_checkbox, args=(key, idx, 0))
-            st.session_state.checkbox_keys[idx][0].append(key)
 
-    with col2:
-        st.write("**Least Likely**")
-        for option in mapping.keys():
-            key = f"least_{idx}_{option}"
-            st.checkbox("", key=key, on_change=on_change_checkbox, args=(key, idx, 1))
-            st.session_state.checkbox_keys[idx][1].append(key)
+col1, col2, col3 = st.columns([1, 1, 5])
 
-    with col3:
-        st.write("**Options**")
-        for option in mapping.keys():
-            st.write(option)
+with col1:
+    st.write("**Most Likely**")
+    for option in mapping.keys():
+        key = f"most_{idx}_{option}"
+        st.checkbox("", key=key, on_change=on_change_checkbox, args=(key, idx, 0))
+        st.session_state.checkbox_keys[idx][0].append(key)
+
+with col2:
+    st.write("**Least Likely**")
+    for option in mapping.keys():
+        key = f"least_{idx}_{option}"
+        st.checkbox("", key=key, on_change=on_change_checkbox, args=(key, idx, 1))
+        st.session_state.checkbox_keys[idx][1].append(key)
+
+with col3:
+    st.write("**Options**")
+    for option in mapping.keys():
+        st.write(option)
 
 # Validation and Submission
-most_likely_selections = [key for idx in range(len(all_mappings)) for key in st.session_state.checkbox_keys[idx][0] if st.session_state.get(key)]
-least_likely_selections = [key for idx in range(len(all_mappings)) for key in st.session_state.checkbox_keys[idx][1] if st.session_state.get(key)]
+most_likely_selected = any(st.session_state.get(key) for key in st.session_state.checkbox_keys[idx][0])
+least_likely_selected = any(st.session_state.get(key) for key in st.session_state.checkbox_keys[idx][1])
 
-if len(most_likely_selections) == len(all_mappings) and len(least_likely_selections) == len(all_mappings):
-    if any(most.split("_")[2] == least.split("_")[2] for most, least in zip(most_likely_selections, least_likely_selections)):
-        st.error("The most likely and least likely options cannot be the same for any set. Please choose different options.")
+# Ensure selections are different
+most_likely_key = next((key for key in st.session_state.checkbox_keys[idx][0] if st.session_state.get(key)), None)
+least_likely_key = next((key for key in st.session_state.checkbox_keys[idx][1] if st.session_state.get(key)), None)
+
+if most_likely_selected and least_likely_selected:
+    
+    if idx < len(all_mappings) - 1:
+        if st.button("Next Section"):
+            st.session_state.current_section += 1
     else:
         if st.button("Submit"):
             # Reset DISC scores before calculation
@@ -72,10 +98,12 @@ if len(most_likely_selections) == len(all_mappings) and len(least_likely_selecti
             st.session_state.disc_scores_least = {"D": 0, "I": 0, "S": 0, "C": 0, "*": 0}
 
             # Calculate DISC scores based on the mappings
-            for most_key, least_key in zip(most_likely_selections, least_likely_selections):
-                idx = int(most_key.split("_")[1])
-                most_option = most_key.split("_")[2]
-                least_option = least_key.split("_")[2]
+            for idx in range(len(all_mappings)):
+                most_likely_key = next(key for key in st.session_state.checkbox_keys[idx][0] if st.session_state.get(key))
+                least_likely_key = next(key for key in st.session_state.checkbox_keys[idx][1] if st.session_state.get(key))
+
+                most_option = most_likely_key.split("_")[2]
+                least_option = least_likely_key.split("_")[2]
 
                 most_disc_type = all_mappings[idx][most_option]["most"]
                 least_disc_type = all_mappings[idx][least_option]["least"]
