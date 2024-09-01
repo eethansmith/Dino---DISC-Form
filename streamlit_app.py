@@ -113,5 +113,6 @@ if len(most_likely_selections) == len(all_mappings) and len(least_likely_selecti
                 st.write(df.to_html(index=False), unsafe_allow_html=True)
             else:
                 st.error("The total scores for both 'Most Likely' and 'Least Likely' must each add up to 24. Please review your selections.")
+
 else:
     st.error("Please make a selection for both most likely and least likely options in each set.")
