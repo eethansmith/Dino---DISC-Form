@@ -7,7 +7,7 @@ with open('disc_mappings.json', 'r') as f:
     mappings = json.load(f)
 
 # Extract all mappings dynamically
-all_mappings = [mappings[f"mapping{i}"] for i in range(1, 25)]  # Adjust range based on the number of mappings in your JSON
+all_mappings = [mappings[f"mapping{i}"] for i in range(1, 8)]  # Adjust range based on the number of mappings in your JSON
 
 # Initialize session state to store selections
 if 'most_likely' not in st.session_state:
@@ -25,6 +25,8 @@ if 'disc_scores_least' not in st.session_state:
 if 'current_section' not in st.session_state:
     st.session_state.current_section = 0  # Start at the first section
 
+if 'same_option_error' not in st.session_state:
+    st.session_state.same_option_error = False  # Initialize error flag
 
 # Define a function to ensure only one checkbox is selected at a time in a column
 def on_change_checkbox(current_key, idx, column):
@@ -44,7 +46,6 @@ def on_change_checkbox(current_key, idx, column):
     else:
         st.session_state.same_option_error = False  # Reset error flag if no conflict
 
-
 # Initialize the keys for checkboxes
 st.session_state.checkbox_keys = [[[], []] for _ in all_mappings]  # Adjust lists based on the number of mappings
 
@@ -53,9 +54,46 @@ st.write("### DISC Personality Assessment")
 st.write("""Choose the option which best reflects your personality. Select one option as the **most likely** and one option as the **least likely**.""")
 st.write("""This form should be completed within **7 minutes**, or as close to that as possible.""")
 
+if 'user_selections' not in st.session_state:
+    st.session_state.user_selections = []
+
+# Function to save user's selections for the current section
+def save_selections(idx):
+    most_likely_key = next((key for key in st.session_state.checkbox_keys[idx][0] if st.session_state.get(key)), None)
+    least_likely_key = next((key for key in st.session_state.checkbox_keys[idx][1] if st.session_state.get(key)), None)
+
+    if most_likely_key and least_likely_key:
+        most_option = most_likely_key.split("_")[2]
+        least_option = least_likely_key.split("_")[2]
+
+        # Save the selection as a dictionary
+        st.session_state.user_selections.append({
+            "section": idx,
+            "most_likely": most_option,
+            "least_likely": least_option
+        })
+
+# Calculate DISC scores after saving selections
+def calculate_disc_scores():
+    # Initialize DISC scores
+    st.session_state.disc_scores_most = {"D": 0, "I": 0, "S": 0, "C": 0, "*": 0}
+    st.session_state.disc_scores_least = {"D": 0, "I": 0, "S": 0, "C": 0, "*": 0}
+
+    # Loop through saved selections to calculate DISC scores
+    for selection in st.session_state.user_selections:
+        idx = selection["section"]
+        most_option = selection["most_likely"]
+        least_option = selection["least_likely"]
+
+        most_disc_type = all_mappings[idx][most_option]["most"]
+        least_disc_type = all_mappings[idx][least_option]["least"]
+
+        st.session_state.disc_scores_most[most_disc_type] += 1  # Increment for Most Likely
+        st.session_state.disc_scores_least[least_disc_type] += 1  # Increment for Least Likely
+
+
 idx = st.session_state.current_section
 mapping = all_mappings[idx]
-
 
 col1, col2, col3 = st.columns([1, 1, 5])
 
@@ -78,39 +116,26 @@ with col3:
     for option in mapping.keys():
         st.write(option)
 
+# Display the same option error message
+if st.session_state.same_option_error:
+    st.error("You cannot select the same option for both 'Most Likely' and 'Least Likely'. Please choose different options.")
+
 # Validation and Submission
 most_likely_selected = any(st.session_state.get(key) for key in st.session_state.checkbox_keys[idx][0])
 least_likely_selected = any(st.session_state.get(key) for key in st.session_state.checkbox_keys[idx][1])
 
-# Ensure selections are different
-most_likely_key = next((key for key in st.session_state.checkbox_keys[idx][0] if st.session_state.get(key)), None)
-least_likely_key = next((key for key in st.session_state.checkbox_keys[idx][1] if st.session_state.get(key)), None)
-
 if most_likely_selected and least_likely_selected:
-    
     if idx < len(all_mappings) - 1:
-        if st.button("Next Section"):
+        # Handle button click before rerendering the UI
+        if st.button("Next"):
+            save_selections(idx)
             st.session_state.current_section += 1
+            st.rerun()  # Force a rerun to immediately update the section
     else:
         if st.button("Submit"):
             # Reset DISC scores before calculation
-            st.session_state.disc_scores_most = {"D": 0, "I": 0, "S": 0, "C": 0, "*": 0}
-            st.session_state.disc_scores_least = {"D": 0, "I": 0, "S": 0, "C": 0, "*": 0}
-
-            # Calculate DISC scores based on the mappings
-            for idx in range(len(all_mappings)):
-                most_likely_key = next(key for key in st.session_state.checkbox_keys[idx][0] if st.session_state.get(key))
-                least_likely_key = next(key for key in st.session_state.checkbox_keys[idx][1] if st.session_state.get(key))
-
-                most_option = most_likely_key.split("_")[2]
-                least_option = least_likely_key.split("_")[2]
-
-                most_disc_type = all_mappings[idx][most_option]["most"]
-                least_disc_type = all_mappings[idx][least_option]["least"]
-
-                st.session_state.disc_scores_most[most_disc_type] += 1  # Increment for Most Likely
-                st.session_state.disc_scores_least[least_disc_type] += 1  # Increment for Least Likely
-
+            calculate_disc_scores()
+            
             # Calculate the sum for each row
             sum_most = sum(st.session_state.disc_scores_most.values())
             sum_least = sum(st.session_state.disc_scores_least.values())
@@ -135,12 +160,7 @@ if most_likely_selected and least_likely_selected:
 
             df = pd.DataFrame(data)
 
-            # Ensure the total adds up to 24 for most/least likely
-            if sum_most == 24 and sum_least == 24:
-                st.write("### DISC Scores Table")
-                st.write(df.to_html(index=False), unsafe_allow_html=True)
-            else:
-                st.error("The total scores for both 'Most Likely' and 'Least Likely' must each add up to 24. Please review your selections.")
-
+            st.write("### DISC Scores Table")
+            st.write(df.to_html(index=False), unsafe_allow_html=True)
 else:
     st.error("Please make a selection for both most likely and least likely options in each set.")
