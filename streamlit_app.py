@@ -7,7 +7,7 @@ with open('disc_mappings.json', 'r') as f:
     mappings = json.load(f)
 
 # Extract all mappings dynamically
-all_mappings = [mappings[f"mapping{i}"] for i in range(1, 8)]  # Adjust range based on the number of mappings in your JSON
+all_mappings = [mappings[f"mapping{i}"] for i in range(1, 25)]  # Adjust range based on the number of mappings in your JSON
 
 # Initialize session state to store selections
 if 'most_likely' not in st.session_state:
@@ -27,6 +27,9 @@ if 'current_section' not in st.session_state:
 
 if 'same_option_error' not in st.session_state:
     st.session_state.same_option_error = False  # Initialize error flag
+
+if 'user_selections' not in st.session_state:
+    st.session_state.user_selections = []
 
 # Define a function to ensure only one checkbox is selected at a time in a column
 def on_change_checkbox(current_key, idx, column):
@@ -48,14 +51,6 @@ def on_change_checkbox(current_key, idx, column):
 
 # Initialize the keys for checkboxes
 st.session_state.checkbox_keys = [[[], []] for _ in all_mappings]  # Adjust lists based on the number of mappings
-
-# Create the table layout with checkboxes
-st.write("### DISC Personality Assessment")
-st.write("""Choose the option which best reflects your personality. Select one option as the **most likely** and one option as the **least likely**.""")
-st.write("""This form should be completed within **7 minutes**, or as close to that as possible.""")
-
-if 'user_selections' not in st.session_state:
-    st.session_state.user_selections = []
 
 # Function to save user's selections for the current section
 def save_selections(idx):
@@ -95,6 +90,14 @@ def calculate_disc_scores():
 idx = st.session_state.current_section
 mapping = all_mappings[idx]
 
+# Calculate progress
+progress = f"{idx + 1}/{len(all_mappings)}"
+
+# Create the table layout with checkboxes
+st.write(f"### DISC Personality Assessment ({progress})")
+st.write("""Choose the option which best reflects your personality. Select one option as the **most likely** and one option as the **least likely**.""")
+st.write("""This form should be completed within **7 minutes**, or as close to that as possible.""")
+
 col1, col2, col3 = st.columns([1, 1, 5])
 
 with col1:
@@ -133,6 +136,7 @@ if most_likely_selected and least_likely_selected:
             st.rerun()  # Force a rerun to immediately update the section
     else:
         if st.button("Submit"):
+            save_selections(idx)
             # Reset DISC scores before calculation
             calculate_disc_scores()
             
