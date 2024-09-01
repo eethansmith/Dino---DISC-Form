@@ -83,21 +83,29 @@ if len(most_likely_selections) == len(all_mappings) and len(least_likely_selecti
                 st.session_state.disc_scores_most[most_disc_type] += 1  # Increment for Most Likely
                 st.session_state.disc_scores_least[least_disc_type] += 1  # Increment for Least Likely
 
-            # Prepare data for the table
+            # Calculate the sum for each row
+            sum_most = sum(st.session_state.disc_scores_most.values())
+            sum_least = sum(st.session_state.disc_scores_least.values())
+
+            # Prepare data for the table including the sum
             data = {
                 "Category": ["Most Likely", "Least Likely"],
                 "D": [st.session_state.disc_scores_most["D"], st.session_state.disc_scores_least["D"]],
                 "I": [st.session_state.disc_scores_most["I"], st.session_state.disc_scores_least["I"]],
                 "S": [st.session_state.disc_scores_most["S"], st.session_state.disc_scores_least["S"]],
                 "C": [st.session_state.disc_scores_most["C"], st.session_state.disc_scores_least["C"]],
-                "*": [st.session_state.disc_scores_most["*"], st.session_state.disc_scores_least["*"]]
+                "*": [st.session_state.disc_scores_most["*"], st.session_state.disc_scores_least["*"]],
+                "Total": [sum_most, sum_least]  # Add the sum as the final column
             }
 
             df = pd.DataFrame(data)
 
-            # Use the 'columns' argument to exclude the index explicitly
-            st.write("### DISC Scores Table")
-            st.write(df.to_html(index=False), unsafe_allow_html=True)
+            # Ensure the total adds up to 24
+            if sum_most == 24 and sum_least == 24:
+                st.write("### DISC Scores Table")
+                st.write(df.to_html(index=False), unsafe_allow_html=True)
+            else:
+                st.error("The total scores for both 'Most Likely' and 'Least Likely' must each add up to 24. Please review your selections.")
 
 else:
     st.error("Please make a selection for both most likely and least likely options in each set.")
