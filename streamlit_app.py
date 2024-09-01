@@ -9,6 +9,16 @@ with open('disc_mappings.json', 'r') as f:
 # Extract all mappings dynamically
 all_mappings = [mappings[f"mapping{i}"] for i in range(1, 25)]  # Adjust range based on the number of mappings in your JSON
 
+# Initialize session state to store user details and selections
+if 'user_details' not in st.session_state:
+    st.session_state.user_details = {
+        "name": "",
+        "date": None,
+        "organization": "",
+        "position": "",
+        "gender": ""
+    }
+
 # Initialize session state to store selections
 if 'most_likely' not in st.session_state:
     st.session_state.most_likely = [None] * len(all_mappings)
@@ -34,7 +44,32 @@ if 'user_selections' not in st.session_state:
 if 'assessment_completed' not in st.session_state:
     st.session_state.assessment_completed = False  # Initialize assessment completion status
 
+# Function to handle the first section for user details
+def input_user_details():
+        # Create the table layout with checkboxes
+    st.write(f"### DISC Personality Assessment")
+    st.write("""Choose the option which best reflects your personality. Select one option as the **most likely** and one option as the **least likely**.""")
+    st.write("""This form should be completed within **7 minutes**, or as close to that as possible.""")
 
+    
+    st.write("### Please fill in your details")
+    
+    # Collect user details
+    st.session_state.user_details['name'] = st.text_input("Name *", st.session_state.user_details['name'])
+    st.session_state.user_details['organization'] = st.text_input("Organization", st.session_state.user_details['organization'])
+    st.session_state.user_details['position'] = st.text_input("Position", st.session_state.user_details['position'])
+    st.session_state.user_details['gender'] = st.radio("Gender", options=["Male", "Female", "Do not disclose"], index=0 if st.session_state.user_details['gender'] == "Do not disclose" else 1)
+    
+    # Always display the Next button
+    next_button_clicked = st.button("Next")
+    
+    # Check if the Next button was clicked without a name provided
+    if next_button_clicked and not st.session_state.user_details['name']:
+        st.error("Name is required to proceed.")
+    elif next_button_clicked:
+        st.session_state.current_section = 1  # Move to the first question of the DISC assessment
+        st.rerun()
+        
 # Define a function to ensure only one checkbox is selected at a time in a column
 def on_change_checkbox(current_key, idx, column):
     # Ensure only one checkbox is selected in the current column
@@ -91,8 +126,10 @@ def calculate_disc_scores():
         st.session_state.disc_scores_least[least_disc_type] += 1  # Increment for Least Likely
 
 # Show the form or the result depending on the assessment completion status
-if not st.session_state.assessment_completed:
-    idx = st.session_state.current_section
+if st.session_state.current_section == 0:
+    input_user_details()  # First, prompt the user to fill in their details
+elif not st.session_state.assessment_completed:
+    idx = st.session_state.current_section - 1  # Adjust the section index because the first section is user details
     mapping = all_mappings[idx]
 
 # Calculate progress
