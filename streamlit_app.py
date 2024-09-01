@@ -87,20 +87,27 @@ if len(most_likely_selections) == len(all_mappings) and len(least_likely_selecti
             sum_most = sum(st.session_state.disc_scores_most.values())
             sum_least = sum(st.session_state.disc_scores_least.values())
 
-            # Prepare data for the table including the sum
+            # Calculate the difference between Most Likely and Least Likely (excluding the * column)
+            diff_D = st.session_state.disc_scores_most["D"] - st.session_state.disc_scores_least["D"]
+            diff_I = st.session_state.disc_scores_most["I"] - st.session_state.disc_scores_least["I"]
+            diff_S = st.session_state.disc_scores_most["S"] - st.session_state.disc_scores_least["S"]
+            diff_C = st.session_state.disc_scores_most["C"] - st.session_state.disc_scores_least["C"]
+            diff_total = diff_D + diff_I + diff_S + diff_C
+
+            # Prepare data for the table including the sum and difference row
             data = {
-                "Category": ["Most Likely", "Least Likely"],
-                "D": [st.session_state.disc_scores_most["D"], st.session_state.disc_scores_least["D"]],
-                "I": [st.session_state.disc_scores_most["I"], st.session_state.disc_scores_least["I"]],
-                "S": [st.session_state.disc_scores_most["S"], st.session_state.disc_scores_least["S"]],
-                "C": [st.session_state.disc_scores_most["C"], st.session_state.disc_scores_least["C"]],
-                "*": [st.session_state.disc_scores_most["*"], st.session_state.disc_scores_least["*"]],
-                "Total": [sum_most, sum_least]  # Add the sum as the final column
+                "Category": ["Most Likely", "Least Likely", "Difference"],
+                "D": [st.session_state.disc_scores_most["D"], st.session_state.disc_scores_least["D"], diff_D],
+                "I": [st.session_state.disc_scores_most["I"], st.session_state.disc_scores_least["I"], diff_I],
+                "S": [st.session_state.disc_scores_most["S"], st.session_state.disc_scores_least["S"], diff_S],
+                "C": [st.session_state.disc_scores_most["C"], st.session_state.disc_scores_least["C"], diff_C],
+                "*": [st.session_state.disc_scores_most["*"], st.session_state.disc_scores_least["*"], "-"],  # Exclude * from Difference calculation
+                "Total": [sum_most, sum_least, diff_total]  # Add the sum as the final column
             }
 
             df = pd.DataFrame(data)
 
-            # Ensure the total adds up to 24
+            # Ensure the total adds up to 24 for most/least likely
             if sum_most == 24 and sum_least == 24:
                 st.write("### DISC Scores Table")
                 st.write(df.to_html(index=False), unsafe_allow_html=True)
