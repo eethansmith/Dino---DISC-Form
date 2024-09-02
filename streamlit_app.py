@@ -14,7 +14,7 @@ all_mappings = [mappings[f"mapping{i}"] for i in range(1, 25)]  # Adjust range b
 if 'user_details' not in st.session_state:
     st.session_state.user_details = {
         "name": "",
-        "date": None,
+        "date_of_birth": "",
         "organization": "",
         "position": "",
         "gender": ""
