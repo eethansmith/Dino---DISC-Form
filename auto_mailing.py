@@ -1,10 +1,11 @@
+import os
 import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 
 def send_email(subject, message, to_email):
-    from_email = "dino.disc.results@mail.com"
-    from_password = 
+    from_email = os.getenv('EMAIL_USER')
+    from_password = os.getenv('EMAIL_PASS')
 
     # Set up the MIME
     msg = MIMEMultipart()

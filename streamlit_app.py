@@ -4,6 +4,8 @@ import json
 import matplotlib.pyplot as plt
 from datetime import date
 
+from auto_mailing import send_email, process_results_and_send_email
+
 # Load mappings from JSON file
 with open('disc_mappings.json', 'r') as f:
     mappings = json.load(f)
@@ -249,6 +251,8 @@ else:
     plt.ylabel('Score Difference')
     plt.grid(True)
     st.pyplot(plt)
+    
+    process_results_and_send_email()
     
     # Thank you message
     user_name = st.session_state.user_details['name']
