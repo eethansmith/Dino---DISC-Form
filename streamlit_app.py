@@ -59,7 +59,7 @@ def input_user_details():
     # Collect user details
     st.session_state.user_details['name'] = st.text_input("Name *", st.session_state.user_details['name'])
     # Add the date of birth input
-    st.session_state.user_details['date_of_birth'] = st.date_input("Date of Birth (optional)", st.session_state.user_details['date_of_birth'])
+    st.session_state.user_details['date_of_birth'] = st.date_input("Date of Birth", st.session_state.user_details['date_of_birth'])
     st.session_state.user_details['organization'] = st.text_input("Organization", st.session_state.user_details['organization'])
     st.session_state.user_details['position'] = st.text_input("Position", st.session_state.user_details['position'])
     st.session_state.user_details['gender'] = st.radio("Gender", options=["Male", "Female", "Do not disclose"], index=0 if st.session_state.user_details['gender'] == "Do not disclose" else 1)
