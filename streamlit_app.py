@@ -47,15 +47,17 @@ if 'assessment_completed' not in st.session_state:
 
 # Function to handle the first section for user details
 def input_user_details():
-    # Create the table layout with checkboxes
+        # Create the table layout with checkboxes
     st.write(f"### DISC Personality Assessment")
     st.write("""Choose the option which best reflects your personality. Select one option as the **most likely** and one option as the **least likely**.""")
     st.write("""This form should be completed within **7 minutes**, or as close to that as possible.""")
+
     
     st.write("### Please fill in your details")
     
     # Collect user details
     st.session_state.user_details['name'] = st.text_input("Name *", st.session_state.user_details['name'])
+    # Add the date of birth input
     st.session_state.user_details['date_of_birth'] = st.date_input("Date of Birth (optional)", st.session_state.user_details['date_of_birth'])
     st.session_state.user_details['organization'] = st.text_input("Organization", st.session_state.user_details['organization'])
     st.session_state.user_details['position'] = st.text_input("Position", st.session_state.user_details['position'])
@@ -70,7 +72,6 @@ def input_user_details():
     elif next_button_clicked:
         st.session_state.current_section = 1  # Move to the first question of the DISC assessment
         st.rerun()
-
         
 # Define a function to ensure only one checkbox is selected at a time in a column
 def on_change_checkbox(current_key, idx, column):
