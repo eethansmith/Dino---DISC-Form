@@ -54,4 +54,4 @@ def plot_disc_graph_most(values):
     ax2.set_xticklabels(labels)
     ax2.spines['top'].set_visible(False)  # Optionally hide the top spine if preferred
 
-    plt.show()
+    return fig, ax 

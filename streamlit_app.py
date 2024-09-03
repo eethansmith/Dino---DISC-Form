@@ -126,7 +126,7 @@ def save_selections(idx):
         
 def auto_mail_results(user_name):
     me = 'disc.assessment.results@gmail.com'
-    password = 'ngpb dgna afkw guuu'
+    password = 'czkh wonz cvay rktd'
     you = 'ethan.a.smith@hotmail.co.uk'#'dino.grif@gmail.com'
     server = 'smtp.gmail.com:587'
 
@@ -175,14 +175,18 @@ def auto_mail_results(user_name):
     message_alternative.attach(MIMEText(text, 'plain'))
     message_alternative.attach(MIMEText(html, 'html'))
 
-    # Save plots as images and attach them
+    # Prepare your data, assuming `most_likely_scores` are already calculated appropriately
+    values = [int(score) for score in most_likely_scores]  # Convert scores to indices if necessary
+
+    # Use your imported function to create the plot
+    fig, ax = plot_disc_graph_most(values)
+
+    # Save the figure
+    fig.savefig('/tmp/most_likely.png')  # You can specify the path and filename here
+    fig.clf()  # Clear the figure after saving to free up memory
+
+    # Append the image path to the images list for attachment or further processing
     images = []
-    
-    # Plot Most Likely and save it
-    most_likely_scores = [st.session_state.disc_scores_most[cat] for cat in ["D", "I", "S", "C"]]
-    fig1 = plot_disc_graph_most(most_likely_scores)  # Capture the returned figure
-    fig1.savefig('/tmp/most_likely.png')  # Save the figure to a file
-    plt.close(fig1)  # Close the figure to free memory
     images.append(('/tmp/most_likely.png', 'image1'))
 
     # Plot Least Likely
@@ -328,44 +332,12 @@ else:
     }
 
     df = pd.DataFrame(data)
-
-    # Comment out or remove the following lines to prevent displaying the table and plots
-    # st.write("### DISC Scores Table")
-    # st.write(df.to_html(index=False), unsafe_allow_html=True)
         
     # Plot the line graphs
     categories = ["D", "I", "S", "C"]
     most_likely_scores = [st.session_state.disc_scores_most[cat] for cat in categories]
     least_likely_scores = [st.session_state.disc_scores_least[cat] for cat in categories]
     difference_scores = [diff_D, diff_I, diff_S, diff_C]
-
-    # Comment out or remove the following lines to prevent displaying the plots
-    # Plot Most Likely
-    # plt.figure(figsize=(10, 4))
-    # plt.plot(categories, most_likely_scores, marker='o', linestyle='-', color='blue')
-    # plt.title('Most Likely DISC Scores')
-    # plt.xlabel('DISC Category')
-    # plt.ylabel('Score')
-    # plt.grid(True)
-    # st.pyplot(plt)
-
-    # Plot Least Likely
-    # plt.figure(figsize=(10, 4))
-    # plt.plot(categories, least_likely_scores, marker='o', linestyle='-', color='green')
-    # plt.title('Least Likely DISC Scores')
-    # plt.xlabel('DISC Category')
-    # plt.ylabel('Score')
-    # plt.grid(True)
-    # st.pyplot(plt)
-
-    # Plot Difference
-    # plt.figure(figsize=(10, 4))
-    # plt.plot(categories, difference_scores, marker='o', linestyle='-', color='red')
-    # plt.title('Difference in DISC Scores (Most - Least)')
-    # plt.xlabel('DISC Category')
-    # plt.ylabel('Score Difference')
-    # plt.grid(True)
-    # st.pyplot(plt)
     
     # Thank you message
     user_name = st.session_state.user_details['name']
