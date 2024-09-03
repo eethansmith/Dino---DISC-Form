@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 from datetime import date, datetime
 
 from auto_mailing import send_email, process_results_and_send_email
+from graph_most import plot_disc_graph_most
 
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
@@ -126,7 +127,7 @@ def save_selections(idx):
 def auto_mail_results(user_name):
     me = 'disc.assessment.results@gmail.com'
     password = 'ngpb dgna afkw guuu'
-    you = 'dino.grif@gmail.com'
+    you = 'ethan.a.smith@hotmail.co.uk'#'dino.grif@gmail.com'
     server = 'smtp.gmail.com:587'
 
     # Prepare DISC data for the table
@@ -136,6 +137,15 @@ def auto_mail_results(user_name):
         ["Least Likely", st.session_state.disc_scores_least['D'], st.session_state.disc_scores_least['I'], st.session_state.disc_scores_least['S'], st.session_state.disc_scores_least['C'], st.session_state.disc_scores_least['*'], sum(st.session_state.disc_scores_least.values())],
         ["Difference", st.session_state.disc_scores_most['D'] - st.session_state.disc_scores_least['D'], st.session_state.disc_scores_most['I'] - st.session_state.disc_scores_least['I'], st.session_state.disc_scores_most['S'] - st.session_state.disc_scores_least['S'], st.session_state.disc_scores_most['C'] - st.session_state.disc_scores_least['C'], "-", (st.session_state.disc_scores_most['D'] - st.session_state.disc_scores_least['D']) + (st.session_state.disc_scores_most['I'] - st.session_state.disc_scores_least['I']) + (st.session_state.disc_scores_most['S'] - st.session_state.disc_scores_least['S']) + (st.session_state.disc_scores_most['C'] - st.session_state.disc_scores_least['C'])]
     ]
+    
+    # Save plots as images and attach them
+    images = []
+    
+    most_likely_scores = [st.session_state.disc_scores_most[cat] for cat in categories]
+    plot_disc_graph_most(most_likely_scores)
+    fig1.savefig('/tmp/most_likely.png')
+    plt.close(fig1)
+    images.append(('/tmp/most_likely.png', 'image1'))
 
     # Create plain text and HTML versions of the message
     text = f"""

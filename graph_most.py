@@ -1,7 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-def plot_disc_graph(values):
+def plot_disc_graph_most(values):
     # Data points and labels
     labels = ['D', 'I', 'S', 'C']
 
