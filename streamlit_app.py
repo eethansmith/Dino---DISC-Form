@@ -6,6 +6,14 @@ from datetime import date
 
 from auto_mailing import send_email, process_results_and_send_email
 
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
+from email.mime.image import MIMEImage
+from tabulate import tabulate
+import smtplib
+
+
+
 # Load mappings from JSON file
 with open('disc_mappings.json', 'r') as f:
     mappings = json.load(f)
@@ -18,8 +26,6 @@ if 'user_details' not in st.session_state:
     st.session_state.user_details = {
         "name": "",
         "date_of_birth": None,
-        "organization": "",
-        "position": "",
         "gender": ""
     }
 
@@ -62,8 +68,6 @@ def input_user_details():
     st.session_state.user_details['name'] = st.text_input("Name *", st.session_state.user_details['name'])
     # Add the date of birth input
     st.session_state.user_details['date_of_birth'] = st.date_input("Date of Birth", st.session_state.user_details['date_of_birth'])
-    st.session_state.user_details['organization'] = st.text_input("Organization", st.session_state.user_details['organization'])
-    st.session_state.user_details['position'] = st.text_input("Position", st.session_state.user_details['position'])
     st.session_state.user_details['gender'] = st.radio("Gender", options=["Male", "Female"], index=0 if st.session_state.user_details['gender'] == "Do not disclose" else 1)
     
     # Always display the Next button
@@ -96,7 +100,6 @@ def on_change_checkbox(current_key, idx, column):
 
 # Initialize the keys for checkboxes
 st.session_state.checkbox_keys = [[[], []] for _ in all_mappings]  # Adjust lists based on the number of mappings
-
 # Function to save user's selections for the current section
 def save_selections(idx):
     most_likely_key = next((key for key in st.session_state.checkbox_keys[idx][0] if st.session_state.get(key)), None)
@@ -112,6 +115,111 @@ def save_selections(idx):
             "most_likely": most_option,
             "least_likely": least_option
         })
+        
+        
+def auto_mail_results(user_name):
+    me = 'disc.assessment.results@gmail.com'
+    password = 'ngpb dgna afkw guuu'
+    you = 'dino.grif@gmail.com'
+    server = 'smtp.gmail.com:587'
+
+    # Prepare DISC data for the table
+    data = [
+        ["Category", "D", "I", "S", "C", "*", "Total"],
+        ["Most Likely", st.session_state.disc_scores_most['D'], st.session_state.disc_scores_most['I'], st.session_state.disc_scores_most['S'], st.session_state.disc_scores_most['C'], st.session_state.disc_scores_most['*'], sum(st.session_state.disc_scores_most.values())],
+        ["Least Likely", st.session_state.disc_scores_least['D'], st.session_state.disc_scores_least['I'], st.session_state.disc_scores_least['S'], st.session_state.disc_scores_least['C'], st.session_state.disc_scores_least['*'], sum(st.session_state.disc_scores_least.values())],
+        ["Difference", st.session_state.disc_scores_most['D'] - st.session_state.disc_scores_least['D'], st.session_state.disc_scores_most['I'] - st.session_state.disc_scores_least['I'], st.session_state.disc_scores_most['S'] - st.session_state.disc_scores_least['S'], st.session_state.disc_scores_most['C'] - st.session_state.disc_scores_least['C'], "-", (st.session_state.disc_scores_most['D'] - st.session_state.disc_scores_least['D']) + (st.session_state.disc_scores_most['I'] - st.session_state.disc_scores_least['I']) + (st.session_state.disc_scores_most['S'] - st.session_state.disc_scores_least['S']) + (st.session_state.disc_scores_most['C'] - st.session_state.disc_scores_least['C'])]
+    ]
+
+    # Create plain text and HTML versions of the message
+    text = f"""
+    This is confirmation of the completion of the DISC Assessment by {user_name}.
+    
+    Date of Birth: {st.session_state.user_details['date_of_birth']}
+    Gender: {st.session_state.user_details['gender']}
+    
+    DISC Results:
+
+    {tabulate(data, headers="firstrow", tablefmt="grid")}
+
+    """
+
+    html = f"""
+    <html><body><p>This is confirmation of the completion of the DISC Assessment by {user_name}.</p>
+    <p>Date of Birth: {st.session_state.user_details['date_of_birth']}</p>
+    <p>Gender: {st.session_state.user_details['gender']}</p>
+    {tabulate(data, headers="firstrow", tablefmt="html")}
+    <p>See attached images for the plotted DISC scores:</p>
+    <img src="cid:image1"><br>
+    <img src="cid:image2"><br>
+    <img src="cid:image3"><br>
+    </body></html>
+    """
+
+    # Construct the email
+    message = MIMEMultipart("related")
+    message['Subject'] = f"DISC Assessment Results | {user_name}"
+    message['From'] = me
+    message['To'] = you
+
+    # Attach text and HTML versions of the email
+    message_alternative = MIMEMultipart("alternative")
+    message.attach(message_alternative)
+    message_alternative.attach(MIMEText(text, 'plain'))
+    message_alternative.attach(MIMEText(html, 'html'))
+
+    # Save plots as images and attach them
+    images = []
+
+    # Plot Most Likely
+    plt.figure(figsize=(6, 3))
+    plt.plot(categories, most_likely_scores, marker='o', linestyle='-', color='blue')
+    plt.title('Most Likely DISC Scores')
+    plt.xlabel('DISC Category')
+    plt.ylabel('Score')
+    plt.grid(True)
+    plt.savefig('/tmp/most_likely.png')
+    plt.close()
+    images.append(('/tmp/most_likely.png', 'image1'))
+
+    # Plot Least Likely
+    plt.figure(figsize=(6, 3))
+    plt.plot(categories, least_likely_scores, marker='o', linestyle='-', color='green')
+    plt.title('Least Likely DISC Scores')
+    plt.xlabel('DISC Category')
+    plt.ylabel('Score')
+    plt.grid(True)
+    plt.savefig('/tmp/least_likely.png')
+    plt.close()
+    images.append(('/tmp/least_likely.png', 'image2'))
+
+    # Plot Difference
+    plt.figure(figsize=(6, 3))
+    plt.plot(categories, difference_scores, marker='o', linestyle='-', color='red')
+    plt.title('Difference in DISC Scores (Most - Least)')
+    plt.xlabel('DISC Category')
+    plt.ylabel('Score Difference')
+    plt.grid(True)
+    plt.savefig('/tmp/difference.png')
+    plt.close()
+    images.append(('/tmp/difference.png', 'image3'))
+
+    # Attach the images to the email
+    for file_path, cid in images:
+        with open(file_path, 'rb') as img_file:
+            img = MIMEImage(img_file.read())
+            img.add_header('Content-ID', f'<{cid}>')
+            message.attach(img)
+
+    # Send the email
+    smtp_server = smtplib.SMTP(server)
+    smtp_server.ehlo()
+    smtp_server.starttls()
+    smtp_server.login(me, password)
+    smtp_server.sendmail(me, you, message.as_string())
+    smtp_server.quit()
+    print('Email sent successfully')    
+    
 
 # Calculate DISC scores after saving selections
 def calculate_disc_scores():
@@ -191,6 +299,8 @@ elif not st.session_state.assessment_completed:
                 st.rerun()  # Force a rerun to display the result
     else: 
         st.error("Please make a selection for both 'Most Likely' and 'Least Likely' options.")
+# ...
+
 else:
     # Calculate the sum for each row
     sum_most = sum(st.session_state.disc_scores_most.values())
@@ -216,8 +326,9 @@ else:
 
     df = pd.DataFrame(data)
 
-    st.write("### DISC Scores Table")
-    st.write(df.to_html(index=False), unsafe_allow_html=True)
+    # Comment out or remove the following lines to prevent displaying the table and plots
+    # st.write("### DISC Scores Table")
+    # st.write(df.to_html(index=False), unsafe_allow_html=True)
         
     # Plot the line graphs
     categories = ["D", "I", "S", "C"]
@@ -225,35 +336,36 @@ else:
     least_likely_scores = [st.session_state.disc_scores_least[cat] for cat in categories]
     difference_scores = [diff_D, diff_I, diff_S, diff_C]
 
+    # Comment out or remove the following lines to prevent displaying the plots
     # Plot Most Likely
-    plt.figure(figsize=(10, 4))
-    plt.plot(categories, most_likely_scores, marker='o', linestyle='-', color='blue')
-    plt.title('Most Likely DISC Scores')
-    plt.xlabel('DISC Category')
-    plt.ylabel('Score')
-    plt.grid(True)
-    st.pyplot(plt)
+    # plt.figure(figsize=(10, 4))
+    # plt.plot(categories, most_likely_scores, marker='o', linestyle='-', color='blue')
+    # plt.title('Most Likely DISC Scores')
+    # plt.xlabel('DISC Category')
+    # plt.ylabel('Score')
+    # plt.grid(True)
+    # st.pyplot(plt)
 
     # Plot Least Likely
-    plt.figure(figsize=(10, 4))
-    plt.plot(categories, least_likely_scores, marker='o', linestyle='-', color='green')
-    plt.title('Least Likely DISC Scores')
-    plt.xlabel('DISC Category')
-    plt.ylabel('Score')
-    plt.grid(True)
-    st.pyplot(plt)
+    # plt.figure(figsize=(10, 4))
+    # plt.plot(categories, least_likely_scores, marker='o', linestyle='-', color='green')
+    # plt.title('Least Likely DISC Scores')
+    # plt.xlabel('DISC Category')
+    # plt.ylabel('Score')
+    # plt.grid(True)
+    # st.pyplot(plt)
 
     # Plot Difference
-    plt.figure(figsize=(10, 4))
-    plt.plot(categories, difference_scores, marker='o', linestyle='-', color='red')
-    plt.title('Difference in DISC Scores (Most - Least)')
-    plt.xlabel('DISC Category')
-    plt.ylabel('Score Difference')
-    plt.grid(True)
-    st.pyplot(plt)
-    
-    process_results_and_send_email()
+    # plt.figure(figsize=(10, 4))
+    # plt.plot(categories, difference_scores, marker='o', linestyle='-', color='red')
+    # plt.title('Difference in DISC Scores (Most - Least)')
+    # plt.xlabel('DISC Category')
+    # plt.ylabel('Score Difference')
+    # plt.grid(True)
+    # st.pyplot(plt)
     
     # Thank you message
     user_name = st.session_state.user_details['name']
+    auto_mail_results(user_name)
     st.write(f"### Thank you, {user_name}, for completing the assessment!")
+    st.write("Your results have been sent to your email.")
