@@ -1,25 +1,29 @@
 import os
 import smtplib
+from dotenv import load_dotenv
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
+import streamlit as st
+
+load_dotenv()
 
 def send_email(subject, message, to_email):
-    from_email = os.getenv('EMAIL_USER')
-    from_password = os.getenv('EMAIL_PASS')
+    from_email = 'dino.disc.results@mail.com'
+    from_password = '!DinoDiscPassword!'
 
     # Set up the MIME
     msg = MIMEMultipart()
-    msg['From'] = dino.disc.results@mail.com
-    msg['To'] = ethan.a.smith@hotmail.co.uk
+    msg['From'] = from_email
+    msg['To'] = to_email
     msg['Subject'] = subject
 
     # Attach the message to the MIME message
     msg.attach(MIMEText(message, 'plain'))
 
-    # Establish a secure session with the server
-    server = smtplib.SMTP('smtp.gmail.com', 587)
-    server.starttls()
-    server.login(from_email, from_password)
+    # Use the SMTP server for mail.com
+    server = smtplib.SMTP('smtp.mail.com', 587)  # mail.com SMTP server
+    server.starttls()  # Start TLS encryption
+    server.login(from_email, from_password)  # Log in to the server
 
     # Send the email
     server.send_message(msg)
@@ -47,6 +51,6 @@ def process_results_and_send_email():
     send_email(
         subject=f"DISC Assessment Results for {user_name}",
         message=results_message,
-        to_email="your_email@example.com"
+        to_email="ethan.a.smith@hotmail.co.uk"
     )
     st.write("Results have been sent to your email.")
