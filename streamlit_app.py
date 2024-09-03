@@ -67,7 +67,12 @@ def input_user_details():
     # Collect user details
     st.session_state.user_details['name'] = st.text_input("Name *", st.session_state.user_details['name'])
     # Add the date of birth input
-    st.session_state.user_details['date_of_birth'] = st.date_input("Date of Birth", st.session_state.user_details['date_of_birth'])
+    st.session_state.user_details['date_of_birth'] = st.date_input(
+    "Date of Birth", 
+    st.session_state.user_details['date_of_birth'], 
+    min_value=datetime(1900, 1, 1),  # Allow dates from January 1, 1900
+    max_value=datetime.today()  # Set the maximum date to today
+)
     st.session_state.user_details['gender'] = st.radio("Gender", options=["Male", "Female"], index=0 if st.session_state.user_details['gender'] == "Do not disclose" else 1)
     
     # Always display the Next button
