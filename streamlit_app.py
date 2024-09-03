@@ -260,7 +260,7 @@ elif not st.session_state.assessment_completed:
     st.write("""Choose the option which best reflects your personality. Select one option as the **most likely** and one option as the **least likely**.""")
     st.write("""This form should be completed within **7 minutes**, or as close to that as possible.""")
 
-    col1, col2, col3 = st.columns([1, 1, 3])
+    col1, col2, col3 = st.columns([1, 1, 5])
 
     with col1:
         st.write("**Most Likely**")
