@@ -2,7 +2,7 @@ import streamlit as st
 import pandas as pd
 import json
 import matplotlib.pyplot as plt
-from datetime import date
+from datetime import date, datetime
 
 from auto_mailing import send_email, process_results_and_send_email
 
