@@ -368,4 +368,4 @@ else:
     user_name = st.session_state.user_details['name']
     auto_mail_results(user_name)
     st.write(f"### Thank you, {user_name}, for completing the assessment!")
-    st.write("Your results have been sent to your email.")
+    st.write("Your results have been sent to Dino.")
