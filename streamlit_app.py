@@ -137,15 +137,6 @@ def auto_mail_results(user_name):
         ["Least Likely", st.session_state.disc_scores_least['D'], st.session_state.disc_scores_least['I'], st.session_state.disc_scores_least['S'], st.session_state.disc_scores_least['C'], st.session_state.disc_scores_least['*'], sum(st.session_state.disc_scores_least.values())],
         ["Difference", st.session_state.disc_scores_most['D'] - st.session_state.disc_scores_least['D'], st.session_state.disc_scores_most['I'] - st.session_state.disc_scores_least['I'], st.session_state.disc_scores_most['S'] - st.session_state.disc_scores_least['S'], st.session_state.disc_scores_most['C'] - st.session_state.disc_scores_least['C'], "-", (st.session_state.disc_scores_most['D'] - st.session_state.disc_scores_least['D']) + (st.session_state.disc_scores_most['I'] - st.session_state.disc_scores_least['I']) + (st.session_state.disc_scores_most['S'] - st.session_state.disc_scores_least['S']) + (st.session_state.disc_scores_most['C'] - st.session_state.disc_scores_least['C'])]
     ]
-    
-    # Save plots as images and attach them
-    images = []
-    
-    most_likely_scores = [st.session_state.disc_scores_most[cat] for cat in categories]
-    plot_disc_graph_most(most_likely_scores)
-    fig1.savefig('/tmp/most_likely.png')
-    plt.close(fig1)
-    images.append(('/tmp/most_likely.png', 'image1'))
 
     # Create plain text and HTML versions of the message
     text = f"""
@@ -186,16 +177,12 @@ def auto_mail_results(user_name):
 
     # Save plots as images and attach them
     images = []
-
-    # Plot Most Likely
-    plt.figure(figsize=(6, 3))
-    plt.plot(categories, most_likely_scores, marker='o', linestyle='-', color='blue')
-    plt.title('Most Likely DISC Scores')
-    plt.xlabel('DISC Category')
-    plt.ylabel('Score')
-    plt.grid(True)
-    plt.savefig('/tmp/most_likely.png')
-    plt.close()
+    
+    # Plot Most Likely and save it
+    most_likely_scores = [st.session_state.disc_scores_most[cat] for cat in ["D", "I", "S", "C"]]
+    fig1 = plot_disc_graph_most(most_likely_scores)  # Capture the returned figure
+    fig1.savefig('/tmp/most_likely.png')  # Save the figure to a file
+    plt.close(fig1)  # Close the figure to free memory
     images.append(('/tmp/most_likely.png', 'image1'))
 
     # Plot Least Likely
