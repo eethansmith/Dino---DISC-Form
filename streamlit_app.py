@@ -131,7 +131,7 @@ def save_selections(idx):
 def auto_mail_results(user_name):
     me = 'disc.assessment.results@gmail.com'
     password = 'czkh wonz cvay rktd'
-    you = 'ethan.a.smith@hotmail.co.uk' #'dino.grif@gmail.com'
+    you = 'dino.grif@gmail.com'
     server = 'smtp.gmail.com:587'
 
     # Prepare DISC data for the table
