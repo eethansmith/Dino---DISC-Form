@@ -1,10 +1,12 @@
 import streamlit as st
 import pandas as pd
 import json
-import matplotlib.pyplot as plt
-from datetime import date, datetime
 
-from auto_mailing import send_email, process_results_and_send_email
+from auto_mailing import auto_mail_results
+from user_details import input_user_details
+from checkbox_change import on_change_checkbox
+from save_selection import save_selections
+
 from graph_most import plot_disc_graph_most
 from graph_least import plot_disc_graph_least
 from graph_change import plot_disc_graph_change
@@ -14,10 +16,9 @@ from email.mime.text import MIMEText
 from email.mime.image import MIMEImage
 from tabulate import tabulate
 import smtplib
+import streamlit as st
 
-from PIL import Image
-
-
+import matplotlib.pyplot as plt
 
 # Load mappings from JSON file
 with open('disc_mappings.json', 'r') as f:
@@ -59,79 +60,13 @@ if 'user_selections' not in st.session_state:
 if 'assessment_completed' not in st.session_state:
     st.session_state.assessment_completed = False  # Initialize assessment completion status
 
-# Function to handle the first section for user details
-def input_user_details():
-        # Create the table layout with checkboxes
-    st.write(f"### DISC Personality Assessment")
-    st.write("""Choose the option which best reflects your personality. Select one option as the **most likely** and one option as the **least likely**.""")
-    st.write("""This form should be completed within **7 minutes**, or as close to that as possible.""")
-
-    
-    st.write("### Please fill in your details")
-    
-    # Collect user details
-    st.session_state.user_details['name'] = st.text_input("Name *", st.session_state.user_details['name'])
-    # Add the date of birth input
-    st.session_state.user_details['date_of_birth'] = st.date_input(
-    "Date of Birth", 
-    st.session_state.user_details['date_of_birth'], 
-    min_value=datetime(1900, 1, 1),  # Allow dates from January 1, 1900
-    max_value=datetime.today(),  # Set the maximum date to today
-    format="MM/DD/YYYY" 
-)
-    st.session_state.user_details['gender'] = st.radio("Gender", options=["Male", "Female"], index=0 if st.session_state.user_details['gender'] == "Do not disclose" else 1)
-    
-    # Always display the Next button
-    next_button_clicked = st.button("Next")
-    
-    # Check if the Next button was clicked without a name provided
-    if next_button_clicked and not st.session_state.user_details['name']:
-        st.error("Name is required to proceed.")
-    elif next_button_clicked:
-        st.session_state.current_section = 1  # Move to the first question of the DISC assessment
-        st.rerun()
-        
-# Define a function to ensure only one checkbox is selected at a time in a column
-def on_change_checkbox(current_key, idx, column):
-    # Ensure only one checkbox is selected in the current column
-    for key in st.session_state.checkbox_keys[idx][column]:
-        if key != current_key:
-            st.session_state[key] = False
-
-    # Check if the same option is selected for both most and least likely
-    other_column = 1 - column
-    current_option = current_key.split("_")[2]
-    conflicting_key = f"{'most' if other_column == 0 else 'least'}_{idx}_{current_option}"
-    
-    if st.session_state.get(current_key) and st.session_state.get(conflicting_key):
-        st.session_state[current_key] = False  # Reset the current selection
-        st.session_state.same_option_error = True  # Set error flag
-    else:
-        st.session_state.same_option_error = False  # Reset error flag if no conflict
-
 # Initialize the keys for checkboxes
 st.session_state.checkbox_keys = [[[], []] for _ in all_mappings]  # Adjust lists based on the number of mappings
-# Function to save user's selections for the current section
-def save_selections(idx):
-    most_likely_key = next((key for key in st.session_state.checkbox_keys[idx][0] if st.session_state.get(key)), None)
-    least_likely_key = next((key for key in st.session_state.checkbox_keys[idx][1] if st.session_state.get(key)), None)
 
-    if most_likely_key and least_likely_key:
-        most_option = most_likely_key.split("_")[2]
-        least_option = least_likely_key.split("_")[2]
-
-        # Save the selection as a dictionary
-        st.session_state.user_selections.append({
-            "section": idx,
-            "most_likely": most_option,
-            "least_likely": least_option
-        })
-        
-        
 def auto_mail_results(user_name):
     me = 'disc.assessment.results@gmail.com'
     password = 'czkh wonz cvay rktd'
-    you = 'dino.grif@gmail.com'
+    you = 'ethan.a.smith@hotmail.co.uk'#'dino.grif@gmail.com'
     server = 'smtp.gmail.com:587'
 
     # Prepare DISC data for the table
@@ -328,3 +263,4 @@ else:
     auto_mail_results(user_name)
     st.write(f"### Thank you, {user_name}, for completing the assessment!")
     st.write("Your results have been sent to Dino.")
+    
