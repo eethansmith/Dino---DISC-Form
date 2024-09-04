@@ -67,7 +67,7 @@ def input_user_details():
     st.write("""This form should be completed within **7 minutes**, or as close to that as possible.""")
 
     
-    st.write("### Please fill in your details")
+    st.write("### Please fill in your details.")
     
     # Collect user details
     st.session_state.user_details['name'] = st.text_input("Name *", st.session_state.user_details['name'])
