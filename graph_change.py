@@ -40,7 +40,7 @@ def plot_disc_graph_change(values):
 
     # Hide y-axis tick labels
     for label in ax.get_yticklabels():
-        label.set_visible(True)
+        label.set_visible(False)
 
 
     # Update x-axis settings
