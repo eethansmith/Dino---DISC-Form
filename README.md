@@ -15,7 +15,7 @@ This Streamlit-based application serves as an interactive form for analyzing ind
 
 - **Streamlit**: For creating the interactive web application.
 - **Python**: Backend logic for scoring and data handling.
-- **Matplotlib/Seaborn**: For generating graphical representations of the DISC scores.
+- **Matplotlib**: For generating graphical representations of the DISC scores.
 - **SMTP Library**: For sending emails with the results.
 
 ## Setup and Installation
