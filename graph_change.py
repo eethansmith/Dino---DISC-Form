@@ -1,7 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-def plot_disc_graph_change(values):
+def plot_disc_graph_change(values, ax):
     # Data points and labels
     labels = ['D', 'I', 'S', 'C']
     
@@ -20,13 +20,12 @@ def plot_disc_graph_change(values):
     mapped_values = [mappings[label][value] for label, value in zip(labels, values)]
 
     # Plot the line graph
-    fig, ax = plt.subplots()
-    plt.subplots_adjust(left=0.05, right=0.35, top=0.45, bottom=0.1)
     positions = np.arange(len(labels))  # x positions for the labels
-    ax.plot(positions, mapped_values, marker='o', linestyle='-', markersize=3,color='#1C4E6B')  # Connect points with a line
+    ax.plot(positions, mapped_values, marker='o', linestyle='-', markersize=5, color='#278D8D')  # Connect points with a line
 
-    ax.set_title("Graph 3 | CHANGE\n", fontsize=12, fontweight='bold')
-    ax.set_title("Mirror, Perceived Self", fontsize=10, fontweight='normal', loc='right', color='gray')
+
+    ax.set_title("Graph 3 | CHANGE\n", fontsize=20, fontweight='bold')
+    ax.set_title("Mirror, Perceived Self", fontsize=15, fontweight='bold', loc='right', color='gray')
 
     # Custom grid lines as specified in previous configuration
     line_styles = {10: ('dotted', 0.5), 20: ('dotted', 1.5), 30: ('dotted', 0.5),
@@ -57,4 +56,4 @@ def plot_disc_graph_change(values):
     ax2.set_xticklabels(labels)
     ax2.spines['top'].set_visible(False)  # Optionally hide the top spine if preferred
 
-    return fig, ax 
+    return ax 

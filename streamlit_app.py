@@ -131,7 +131,7 @@ def save_selections(idx):
 def auto_mail_results(user_name):
     me = 'disc.assessment.results@gmail.com'
     password = 'czkh wonz cvay rktd'
-    you = 'ethan.a.smith@hotmail.co.uk'#'dino.grif@gmail.com'
+    you = 'dino.grif@gmail.com'
     server = 'smtp.gmail.com:587'
 
     # Prepare DISC data for the table
@@ -162,8 +162,6 @@ def auto_mail_results(user_name):
     {tabulate(data, headers="firstrow", tablefmt="html")}
     <p>See attached images for the plotted DISC scores:</p>
     <img src="cid:image1"><br>
-    <img src="cid:image2"><br>
-    <img src="cid:image3"><br>
     </body></html>
     """
 
@@ -178,42 +176,31 @@ def auto_mail_results(user_name):
     message.attach(message_alternative)
     message_alternative.attach(MIMEText(text, 'plain'))
     message_alternative.attach(MIMEText(html, 'html'))
+    
+    # Create a single figure with three subplots
+    fig, axs = plt.subplots(1, 3, figsize=(18, 6))
 
     values_most = [int(score) for score in most_likely_scores]  
     values_least = [int(score) for score in least_likely_scores]
     values_change = [int(score) for score in difference_scores]
 
-    fig, ax = plot_disc_graph_most(values_most)
+    # Plot each graph on its respective axis
+    plot_disc_graph_most(values_most, axs[0])
+    plot_disc_graph_least(values_least, axs[1])
+    plot_disc_graph_change(values_change, axs[2])
+    
+    # Save the combined figure
+    fig.tight_layout()  # Adjust layout to prevent overlap
+    fig.savefig('/tmp/all_disc_graphs.png')
+    plt.close(fig)  # Close the figure properly after saving
 
-    fig.savefig('/tmp/most_likely.png') 
-    
-    fig.clf() 
-
-    fig, ax = plot_disc_graph_least(values_least)
-    
-    fig.savefig('/tmp/least_likely.png')
-    
-    fig.clf()
-    
-    fig, ax = plot_disc_graph_change(values_change)
-    
-    fig.savefig('/tmp/change_likely.png')
-    
-    fig.clf()
-    
-    images = []
-    images.append(('/tmp/most_likely.png', 'image1'))
-
-    images.append(('/tmp/least_likely.png', 'image2'))
-    
-    images.append(('/tmp/change_likely.png', 'image3'))
-
-    # Attach the images to the email
-    for file_path, cid in images:
-        with open(file_path, 'rb') as img_file:
-            img = MIMEImage(img_file.read())
-            img.add_header('Content-ID', f'<{cid}>')
-            message.attach(img)
+    # Attach the combined image to the email
+    file_path = '/tmp/all_disc_graphs.png'
+    cid = 'image1'
+    with open(file_path, 'rb') as img_file:
+        img = MIMEImage(img_file.read())
+        img.add_header('Content-ID', f'<{cid}>')
+        message.attach(img)
 
     # Send the email
     smtp_server = smtplib.SMTP(server)
@@ -222,7 +209,7 @@ def auto_mail_results(user_name):
     smtp_server.login(me, password)
     smtp_server.sendmail(me, you, message.as_string())
     smtp_server.quit()
-    print('Email sent successfully')    
+    print('Email sent successfully')
     
 
 # Calculate DISC scores after saving selections
