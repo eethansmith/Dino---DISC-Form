@@ -15,6 +15,8 @@ from email.mime.image import MIMEImage
 from tabulate import tabulate
 import smtplib
 
+from PIL import Image
+
 
 
 # Load mappings from JSON file
@@ -205,17 +207,6 @@ def auto_mail_results(user_name):
     images.append(('/tmp/least_likely.png', 'image2'))
     
     images.append(('/tmp/change_likely.png', 'image3'))
-
-    # Plot Difference
-    plt.figure(figsize=(6, 3))
-    plt.plot(categories, difference_scores, marker='o', linestyle='-', color='red')
-    plt.title('Difference in DISC Scores (Most - Least)')
-    plt.xlabel('DISC Category')
-    plt.ylabel('Score Difference')
-    plt.grid(True)
-    plt.savefig('/tmp/difference.png')
-    fig.clf()
-    
 
     # Attach the images to the email
     for file_path, cid in images:
