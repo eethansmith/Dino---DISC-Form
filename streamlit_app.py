@@ -67,7 +67,7 @@ def input_user_details():
     st.write("""This form should be completed within **7 minutes**, or as close to that as possible.""")
 
     
-    st.write("### Please fill in your details.")
+    st.write("### Please fill in your details")
     
     # Collect user details
     st.session_state.user_details['name'] = st.text_input("Name *", st.session_state.user_details['name'])
@@ -241,7 +241,7 @@ elif not st.session_state.assessment_completed:
     progress = f"{idx + 1}/{len(all_mappings)}"
 
     # Create the table layout with checkboxes
-    st.write(f"### DISC Personality Assessment. ({progress})")
+    st.write(f"### DISC Personality Assessment ({progress})")
     st.write("""Choose the option which best reflects your personality. Select one option as the **most likely** and one option as the **least likely**.""")
     st.write("""This form should be completed within **7 minutes**, or as close to that as possible.""")
 
