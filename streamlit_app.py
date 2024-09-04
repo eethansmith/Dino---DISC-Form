@@ -6,6 +6,8 @@ from datetime import date, datetime
 
 from auto_mailing import send_email, process_results_and_send_email
 from graph_most import plot_disc_graph_most
+from graph_least import plot_disc_graph_least
+from graph_change import plot_disc_graph_change
 
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
@@ -175,30 +177,34 @@ def auto_mail_results(user_name):
     message_alternative.attach(MIMEText(text, 'plain'))
     message_alternative.attach(MIMEText(html, 'html'))
 
-    # Prepare your data, assuming `most_likely_scores` are already calculated appropriately
-    values = [int(score) for score in most_likely_scores]  # Convert scores to indices if necessary
+    values_most = [int(score) for score in most_likely_scores]  
+    values_least = [int(score) for score in least_likely_scores]
+    values_change = [int(score) for score in difference_scores]
 
-    # Use your imported function to create the plot
-    fig, ax = plot_disc_graph_most(values)
+    fig, ax = plot_disc_graph_most(values_most)
 
-    # Save the figure
-    fig.savefig('/tmp/most_likely.png')  # You can specify the path and filename here
-    fig.clf()  # Clear the figure after saving to free up memory
+    fig.savefig('/tmp/most_likely.png') 
+    
+    fig.clf() 
 
-    # Append the image path to the images list for attachment or further processing
+    fig, ax = plot_disc_graph_least(values_least)
+    
+    fig.savefig('/tmp/least_likely.png')
+    
+    fig.clf()
+    
+    fig, ax = plot_disc_graph_change(values_change)
+    
+    fig.savefig('/tmp/change_likely.png')
+    
+    fig.clf()
+    
     images = []
     images.append(('/tmp/most_likely.png', 'image1'))
 
-    # Plot Least Likely
-    plt.figure(figsize=(6, 3))
-    plt.plot(categories, least_likely_scores, marker='o', linestyle='-', color='green')
-    plt.title('Least Likely DISC Scores')
-    plt.xlabel('DISC Category')
-    plt.ylabel('Score')
-    plt.grid(True)
-    plt.savefig('/tmp/least_likely.png')
-    plt.close()
     images.append(('/tmp/least_likely.png', 'image2'))
+    
+    images.append(('/tmp/change_likely.png', 'image3'))
 
     # Plot Difference
     plt.figure(figsize=(6, 3))
@@ -208,8 +214,8 @@ def auto_mail_results(user_name):
     plt.ylabel('Score Difference')
     plt.grid(True)
     plt.savefig('/tmp/difference.png')
-    plt.close()
-    images.append(('/tmp/difference.png', 'image3'))
+    fig.clf()
+    
 
     # Attach the images to the email
     for file_path, cid in images:
