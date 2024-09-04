@@ -2,7 +2,6 @@ import streamlit as st
 import pandas as pd
 import json
 
-from auto_mailing import auto_mail_results
 from user_details import input_user_details
 from checkbox_change import on_change_checkbox
 from save_selection import save_selections
@@ -66,7 +65,7 @@ st.session_state.checkbox_keys = [[[], []] for _ in all_mappings]  # Adjust list
 def auto_mail_results(user_name):
     me = 'disc.assessment.results@gmail.com'
     password = 'czkh wonz cvay rktd'
-    you = 'ethan.a.smith@hotmail.co.uk'#'dino.grif@gmail.com'
+    you = 'dino.grif@gmail.com'
     server = 'smtp.gmail.com:587'
 
     # Prepare DISC data for the table
