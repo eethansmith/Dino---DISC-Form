@@ -52,4 +52,9 @@ def plot_disc_graph_most(values, ax):
     ax2.set_xticklabels(labels)
     ax2.spines['top'].set_visible(False)  # Optionally hide the top spine if preferred
 
+        # Label the points with original values
+    for i, value in enumerate(values):
+        ax.text(positions[i], mapped_values[i] + 1, f'{value}', ha='center', fontsize=12, color='#1C80BC')
+
+    
     return ax 

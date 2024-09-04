@@ -55,5 +55,8 @@ def plot_disc_graph_least(values, ax):
     ax2.set_xticks(positions)
     ax2.set_xticklabels(labels)
     ax2.spines['top'].set_visible(False)  # Optionally hide the top spine if preferred
+    
+    for i, value in enumerate(values):
+        ax.text(positions[i], mapped_values[i] - 2, f'{value}', ha='center', fontsize=12, color='#A00100')
 
     return ax 

@@ -5,7 +5,7 @@ def plot_disc_graph_change(values, ax):
     # Data points and labels
     labels = ['D', 'I', 'S', 'C']
     
-    values = [value + 24 for value in values]
+    values24 = [value + 24 for value in values]
 
     # Define mappings for each label
     mappings = {
@@ -17,7 +17,7 @@ def plot_disc_graph_change(values, ax):
 
 
     # Transform original values using mappings
-    mapped_values = [mappings[label][value] for label, value in zip(labels, values)]
+    mapped_values = [mappings[label][value] for label, value in zip(labels, values24)]
 
     # Plot the line graph
     positions = np.arange(len(labels))  # x positions for the labels
@@ -55,5 +55,10 @@ def plot_disc_graph_change(values, ax):
     ax2.set_xticks(positions)
     ax2.set_xticklabels(labels)
     ax2.spines['top'].set_visible(False)  # Optionally hide the top spine if preferred
+    
+        
+    for i, value in enumerate(values):
+        ax.text(positions[i], mapped_values[i] + 1, f'{value}', ha='right', fontsize=12, color='#278D8D')
+
 
     return ax 
