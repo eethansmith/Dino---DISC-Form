@@ -64,8 +64,8 @@ st.session_state.checkbox_keys = [[[], []] for _ in all_mappings]  # Adjust list
 
 def auto_mail_results(user_name):
     me = 'disc.assessment.results@gmail.com'
-    password = 'czkh wonz cvay rktd'
-    you = 'esm7thy5@gmail.com'
+    password = 'hosh zifz ooij srja'
+    you = 'ethan.a.smith@hotmail.co.uk'
     server = 'smtp.gmail.com:587'
 
     # Prepare DISC data for the table
