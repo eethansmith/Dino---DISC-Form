@@ -4,7 +4,6 @@ import json
 
 from st_paywall import add_auth
 
-from paywall import access_paywall
 from user_details import input_user_details
 from checkbox_change import on_change_checkbox
 from save_selection import save_selections
