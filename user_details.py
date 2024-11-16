@@ -1,14 +1,15 @@
 import streamlit as st
+from st_paywall import add_auth
 from datetime import date, datetime
 
 # Function to handle the first section for user details
 def input_user_details():
         # Create the table layout with checkboxes
     st.write(f"### DISC Personality Assessment")
-    st.write("""Choose the option which best reflects your personality. Select one option as the **most likely** and one option as the **least likely**.""")
-    st.write("""This form should be completed within **7 minutes**, or as close to that as possible.""")
-
-    
+    st.write("""To begin with the DISC personality assessment, please complete Google authentication and proceed to secure payment.""")
+    st.write("""The fee for this Assessment will be **$0.00**.""")
+    st.write("""For any queries, please contact dino.grif@gmail.com""")
+    add_auth(required=True)
     st.write("### Please fill in your details")
     
     # Collect user details
@@ -22,7 +23,6 @@ def input_user_details():
     format="MM/DD/YYYY" 
     )
     st.session_state.user_details['gender'] = st.radio("Gender", options=["Male", "Female"], index=0 if st.session_state.user_details['gender'] == "Do not disclose" else 1)
-    
     # Always display the Next button
     next_button_clicked = st.button("Next")
     
