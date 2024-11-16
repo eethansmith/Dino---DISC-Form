@@ -9,8 +9,7 @@ def input_user_details():
     st.write("""To begin with the DISC personality assessment, please complete Google authentication and proceed to secure payment.""")
     st.write("""The fee for this Assessment will be **$0.00**.""")
     st.write("""For any queries, please contact dino.grif@gmail.com""")
-    add_auth(required=True)
-    if st.session_state.user_subscribed:
+    if pigs_can_fly:
         st.write("### Payment Successful! Please fill in your details")
         
         # Collect user details
