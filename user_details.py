@@ -10,7 +10,7 @@ def input_user_details():
     st.write("""The fee for this Assessment will be **$0.00**.""")
     st.write("""For any queries, please contact dino.grif@gmail.com""")
     add_auth(required=True)
-    st.write
+    st.write("Payment Status: {st.session_state.user_subscribed}")
     st.write("### Payment Successful! Please fill in your details")
     
     # Collect user details
