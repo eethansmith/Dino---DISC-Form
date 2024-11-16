@@ -1,5 +1,4 @@
 import streamlit as st
-from st_paywall import add_auth
 from datetime import date, datetime
 
 # Function to handle the first section for user details
@@ -9,6 +8,8 @@ def input_user_details():
     st.write("""To begin with the DISC personality assessment, please complete Google authentication and proceed to secure payment.""")
     st.write("""The fee for this Assessment will be **$0.00**.""")
     st.write("""For any queries, please contact dino.grif@gmail.com""")
+    pigs_can_fly = st.link_button("Proceed to Payment", https://buy.stripe.com/test_5kAaHxflK4WQ1K8fYY)
+    pigs_can_fly = False
     if pigs_can_fly:
         st.write("### Payment Successful! Please fill in your details")
         
