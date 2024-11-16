@@ -33,6 +33,7 @@ all_mappings = [mappings[f"mapping{i}"] for i in range(1, 25)]  # Adjust range b
 if 'user_details' not in st.session_state:
     st.session_state.user_details = {
         "name": "",
+        "email": "",
         "date_of_birth": None,
         "gender": ""
     }
@@ -83,6 +84,7 @@ def auto_mail_results(user_name):
     text = f"""
     This is confirmation of the completion of the DISC Assessment by {user_name}.
     
+    Contact {user_name} email: {st.session_state.user_details['email']}.
     Date of Birth: {st.session_state.user_details['date_of_birth']}
     Gender: {st.session_state.user_details['gender']}
     
