@@ -6,7 +6,7 @@ def input_user_details():
         # Create the table layout with checkboxes
     st.write(f"### DISC Personality Assessment")
     st.write("""To begin with the DISC personality assessment, please proceed to secure Stripe payment using the button below.""")
-    st.write("""The fee for this Assessment will be **$0.00**.""")
+    st.write("""The fee for this Assessment will be **$25.00**.""")
     st.write("""For any queries, please contact dino.grif@gmail.com""")
     pigs_can_fly = st.link_button("Proceed to Payment", 'https://buy.stripe.com/test_5kAaHxflK4WQ1K8fYY')
     pigs_can_fly = False
