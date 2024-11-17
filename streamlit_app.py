@@ -66,8 +66,8 @@ if 'assessment_completed' not in st.session_state:
 st.session_state.checkbox_keys = [[[], []] for _ in all_mappings]  # Adjust lists based on the number of mappings
 
 def auto_mail_results(user_name):
-    me = 'disc.assessment.results@gmail.com'
-    password = 'hosh zifz ooij srja'
+    me = '...'
+    password = '...'
     you = 'dino.grif@gmail.com'
     server = 'smtp.gmail.com:587'
 
